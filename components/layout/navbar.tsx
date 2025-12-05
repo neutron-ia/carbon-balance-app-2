@@ -204,7 +204,7 @@ export function Navbar() {
                     onClick={closeMenu}
                     className="text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors py-3 px-4 rounded-lg flex items-center justify-between"
                   >
-                    API
+                    Análisis
                     <ExternalLinkIcon className="w-4 h-4" />
                   </a>
                 </div>
