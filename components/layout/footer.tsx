@@ -125,7 +125,7 @@ export function Footer() {
             </p>
             <div className="mb-4">
               <Image
-                src="/images/colectivohagamos.png"
+                src="/images/colectivohagamos.webp"
                 alt="Colectivo HAGAMOS"
                 width={180}
                 height={47}

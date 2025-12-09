@@ -13,23 +13,15 @@ const teamMembers = [
     name: "Marilyn Barbosa",
     role: "Scrum Master",
     description: "Bióloga y Científica de Datos",
-    image: "/images/DannaMarilynBarbosa.png",
+    image: "/images/DannaMarilynBarbosa.webp",
     linkedin: "https://www.linkedin.com/in/danna-marilyn-barbosa-cardenas/",
     github: "https://github.com/kappagirl",
-  },
-  {
-    name: "Mario Álvarez",
-    role: "Developer",
-    description: "Ing. de Automatización y Desarrollador",
-    image: "/images/MarioDavidAlvarez.png",
-    linkedin: "https://www.linkedin.com/in/mrdavidalv/",
-    github: "https://github.com/MrDavidAlv",
   },
   {
     name: "Ana Maria Arosa",
     role: "Developer",
     description: "Mercadóloga y Analista de Datos",
-    image: "/images/AnaMariaArosa.png",
+    image: "/images/AnaMariaArosa.webp",
     linkedin: "https://www.linkedin.com/in/ana-arosa/",
     github: "https://github.com/anamarosag",
   },
@@ -37,10 +29,18 @@ const teamMembers = [
     name: "Lucía O. Cardenas",
     role: "Product Owner",
     description: "Ingeniera de alimentos y Gestora de Innovación.",
-    image: "/images/MarthaOrtizCardenas.png",
+    image: "/images/MarthaOrtizCardenas.webp",
     linkedin: "https://www.linkedin.com/in/luciacardenas/",
     github: "https://github.com/carluute",
   },
+  {
+    name: "Mario Álvarez",
+    role: "Developer",
+    description: "Ing. de Automatización y Desarrollador",
+    image: "/images/MarioDavidAlvarez.webp",
+    linkedin: "https://www.linkedin.com/in/mrdavidalv/",
+    github: "https://github.com/MrDavidAlv",
+  }
 ]
 
 export default function AboutPage() {
@@ -116,7 +116,7 @@ export default function AboutPage() {
           <Card className="p-8">
             <div className="flex flex-col items-center text-center space-y-4">
               <Image
-                src="/images/colectivohagamos.png"
+                src="/images/colectivohagamos.webp"
                 alt="Colectivo HAGAMOS"
                 width={300}
                 height={78}

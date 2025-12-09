@@ -14,6 +14,31 @@ export const metadata: Metadata = {
   generator: "v0.app",
   keywords: ["carbono", "emisiones", "santander", "colombia", "medio ambiente", "sostenibilidad"],
   authors: [{ name: "Colectivo HAGAMOS" }],
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://ecobalance360.vercel.app"),
+  openGraph: {
+    title: "EcoBalance360 - Balance de Carbono Municipal",
+    description:
+      "Herramienta de analítica territorial para visualizar el balance de carbono en los municipios de Santander, Colombia",
+    url: "/",
+    siteName: "EcoBalance360",
+    images: [
+      {
+        url: "/apple-icon.png",
+        width: 1000,
+        height: 1000,
+        alt: "EcoBalance360 - Balance de Carbono Municipal",
+      },
+    ],
+    locale: "es_CO",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EcoBalance360 - Balance de Carbono Municipal",
+    description:
+      "Herramienta de analítica territorial para visualizar el balance de carbono en los municipios de Santander, Colombia",
+    images: ["/apple-icon.png"],
+  },
   icons: {
     icon: [
       {

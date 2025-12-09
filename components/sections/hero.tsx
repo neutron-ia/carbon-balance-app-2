@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Leaf } from "lucide-react"
+import { ArrowRight } from "lucide-react"
+import { LeafIcon } from "@/components/layout/navbar"
 
 export function Hero() {
   return (
@@ -8,7 +9,7 @@ export function Hero() {
       <div className="container mx-auto px-4 py-24 md:py-32">
         <div className="mx-auto max-w-3xl text-center space-y-8">
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-            <Leaf className="w-4 h-4" />
+            <LeafIcon />
             Balance de Carbono Municipal
           </div>
 
