@@ -3,9 +3,9 @@ import { google } from "@ai-sdk/google"
 
 export async function POST(request: Request) {
   try {
-    const { municipality, messages = [], userMessage } = await request.json()
+    const { municipality, messages = [], userMessage, model = "gemini-2.0-flash-exp" } = await request.json()
 
-    console.log("[v0] Starting AI analysis for:", municipality.municipio)
+    console.log("[v0] Starting AI analysis for:", municipality.municipio, "with model:", model)
 
     // Build the system context
     const systemContext = `Eres un experto en análisis ambiental y balance de carbono. Estás conversando sobre el municipio de ${municipality.municipio}, Santander, Colombia.
@@ -42,7 +42,7 @@ Responde en español de forma clara, concisa y profesional. Usa un tono construc
       : `${systemContext}\n\n${userPrompt}`
 
     const { text } = await generateText({
-      model: google("gemini-2.0-flash-exp"),
+      model: google(model),
       prompt: fullPrompt,
       temperature: 0.7,
       maxTokens: 1500,
