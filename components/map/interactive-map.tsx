@@ -4,8 +4,14 @@ import { useEffect, useState, useCallback } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Download, Maximize2 } from "lucide-react"
+import { Download, Maximize2, Filter, X, Info } from "lucide-react"
 import dynamic from "next/dynamic"
+import { Badge } from "@/components/ui/badge"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 const LeafletMap = dynamic(() => import("./leaflet-map"), { ssr: false })
 
@@ -42,6 +48,11 @@ export function InteractiveMap({ selectedMunicipalityName, onMunicipalitySelect 
   const [selectedMunicipality, setSelectedMunicipality] = useState<Municipality | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+
+  // Filtros
+  const [filterClasificacion, setFilterClasificacion] = useState<string[]>([])
+  const [filterPerfil, setFilterPerfil] = useState<string[]>([])
+  const [viewMode, setViewMode] = useState<'balance' | 'perfil'>('balance')
 
   useEffect(() => {
     console.log("[v0] Fetching municipalities data...")
@@ -100,11 +111,154 @@ export function InteractiveMap({ selectedMunicipalityName, onMunicipalitySelect 
     setIsFullscreen(!isFullscreen)
   }
 
+  // Filtrar municipios
+  const filteredMunicipalities = municipalities.filter((m) => {
+    // Filtro por clasificación
+    if (filterClasificacion.length > 0 && !filterClasificacion.includes(m.clasificacion)) {
+      return false
+    }
+    // Filtro por perfil
+    if (filterPerfil.length > 0 && !filterPerfil.includes(m.perfil)) {
+      return false
+    }
+    return true
+  })
+
+  // Verificar si el municipio seleccionado está en los filtrados
+  const isSelectedMunicipalityVisible = selectedMunicipality
+    ? filteredMunicipalities.some(m => m.codMunicipio === selectedMunicipality.codMunicipio)
+    : false
+
+  // Toggle de clasificación
+  const toggleClasificacion = (clasificacion: string) => {
+    setFilterClasificacion((prev) =>
+      prev.includes(clasificacion) ? prev.filter((c) => c !== clasificacion) : [...prev, clasificacion],
+    )
+  }
+
+  // Toggle de perfil
+  const togglePerfil = (perfil: string) => {
+    setFilterPerfil((prev) => (prev.includes(perfil) ? prev.filter((p) => p !== perfil) : [...prev, perfil]))
+  }
+
   return (
     <Card className={`p-4 ${isFullscreen ? "fixed inset-4 z-50" : ""}`}>
+      {/* Toggle de modo de visualización + Info */}
+      <div className="mb-3 flex items-center justify-between flex-wrap gap-2">
+        <div className="flex gap-2 items-center">
+          <Button
+            variant={viewMode === 'balance' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('balance')}
+          >
+            Por Balance
+          </Button>
+          <Button
+            variant={viewMode === 'perfil' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('perfil')}
+          >
+            Por Perfil
+          </Button>
+
+          {/* Popover informativo */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Info className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80" align="start">
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm">Visualización del Mapa</h4>
+
+                <div className="space-y-2 text-xs">
+                  <div>
+                    <p className="font-medium mb-1">Por Balance (IEC):</p>
+                    <ul className="space-y-1 ml-2">
+                      <li>• <strong>Sumidero (0-40):</strong> Captura más CO₂ del que emite</li>
+                      <li>• <strong>Equilibrio (41-60):</strong> Captura ≈ Emisiones</li>
+                      <li>• <strong>Emisor (61-100):</strong> Emite más CO₂ del que captura</li>
+                    </ul>
+                    <p className="text-muted-foreground mt-1 italic">
+                      *IEC es un índice normalizado de 0-100, no son toneladas.
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="font-medium mb-1">Por Perfil (Clustering):</p>
+                    <ul className="space-y-1 ml-2">
+                      <li>• <strong>Agrícola-Ganadero:</strong> Economía rural</li>
+                      <li>• <strong>Industrial-Urbano:</strong> Ciudades grandes</li>
+                      <li>• <strong>Mixto-Transición:</strong> Economía diversa</li>
+                      <li>• <strong>Sumideros Forestales:</strong> Alta cobertura boscosa</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div className="flex gap-2 items-center">
+          <span className="text-xs text-muted-foreground">
+            {filteredMunicipalities.length} de {municipalities.length}
+          </span>
+          {(filterClasificacion.length > 0 || filterPerfil.length > 0) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setFilterClasificacion([])
+                setFilterPerfil([])
+              }}
+            >
+              <X className="w-3 h-3 mr-1" />
+              Limpiar
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Filtros compactos */}
+      <div className="mb-3 space-y-2">
+        {/* Filtro por Clasificación */}
+        <div className="flex flex-wrap gap-1.5 items-center">
+          <span className="text-xs text-muted-foreground font-medium w-20">Clasificación:</span>
+          {['Sumidero', 'Equilibrio', 'Emisor'].map((clasificacion) => (
+            <Badge
+              key={clasificacion}
+              variant={filterClasificacion.includes(clasificacion) ? 'default' : 'outline'}
+              className="cursor-pointer text-xs px-2 py-0.5"
+              onClick={() => toggleClasificacion(clasificacion)}
+            >
+              {clasificacion}
+            </Badge>
+          ))}
+        </div>
+
+        {/* Filtro por Perfil */}
+        <div className="flex flex-wrap gap-1.5 items-center">
+          <span className="text-xs text-muted-foreground font-medium w-20">Perfil:</span>
+          {['Agrícola-Ganadero', 'Industrial-Urbano', 'Mixto-Transición', 'Sumideros Forestales'].map((perfil) => (
+            <Badge
+              key={perfil}
+              variant={filterPerfil.includes(perfil) ? 'default' : 'outline'}
+              className="cursor-pointer text-xs px-2 py-0.5"
+              onClick={() => togglePerfil(perfil)}
+            >
+              {perfil}
+            </Badge>
+          ))}
+        </div>
+      </div>
+
       <div className="mb-4 flex flex-col sm:flex-row gap-2">
         <div className="flex-1 relative z-50">
-          <Select value={selectedMunicipality?.municipio} onValueChange={handleMunicipalitySelect}>
+          <Select
+            value={isSelectedMunicipalityVisible ? selectedMunicipality?.municipio : undefined}
+            onValueChange={handleMunicipalitySelect}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Seleccionar municipio..." />
             </SelectTrigger>
@@ -113,12 +267,12 @@ export function InteractiveMap({ selectedMunicipalityName, onMunicipalitySelect 
                 <SelectItem value="loading" disabled>
                   Cargando municipios...
                 </SelectItem>
-              ) : municipalities.length === 0 ? (
+              ) : filteredMunicipalities.length === 0 ? (
                 <SelectItem value="empty" disabled>
-                  No hay datos disponibles
+                  No hay municipios con estos filtros
                 </SelectItem>
               ) : (
-                municipalities.map((municipality) => (
+                filteredMunicipalities.map((municipality) => (
                   <SelectItem key={municipality.codMunicipio} value={municipality.municipio}>
                     {municipality.municipio}
                   </SelectItem>
@@ -151,29 +305,55 @@ export function InteractiveMap({ selectedMunicipalityName, onMunicipalitySelect 
           </div>
         ) : (
           <LeafletMap
-            municipalities={municipalities}
+            municipalities={filteredMunicipalities}
             selectedMunicipality={selectedMunicipality}
             onMunicipalityClick={handleMunicipalitySelect}
+            viewMode={viewMode}
           />
         )}
       </div>
 
       <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
         <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-emerald-500" />
-            <span>Sumidero (Negativo)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-amber-500" />
-            <span>Equilibrio</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-rose-500" />
-            <span>Emisor (Positivo)</span>
-          </div>
+          {viewMode === 'balance' ? (
+            <>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                <span>Sumidero (IEC 0-40)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-amber-500" />
+                <span>Equilibrio (IEC 41-60)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-rose-500" />
+                <span>Emisor (IEC 61-100)</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-green-600" />
+                <span>Agrícola-Ganadero</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-600" />
+                <span>Industrial-Urbano</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                <span>Mixto-Transición</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-blue-600" />
+                <span>Sumideros Forestales</span>
+              </div>
+            </>
+          )}
         </div>
-        <div className="text-xs">{isLoading ? "Cargando..." : `${municipalities.length} municipios`}</div>
+        <div className="text-xs">
+          {isLoading ? "Cargando..." : `${filteredMunicipalities.length} de ${municipalities.length} municipios`}
+        </div>
       </div>
     </Card>
   )

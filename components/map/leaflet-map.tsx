@@ -10,9 +10,10 @@ interface LeafletMapProps {
   municipalities: Municipality[]
   selectedMunicipality: Municipality | null
   onMunicipalityClick: (municipalityName: string) => void
+  viewMode?: 'balance' | 'perfil'
 }
 
-export default function LeafletMap({ municipalities, selectedMunicipality, onMunicipalityClick }: LeafletMapProps) {
+export default function LeafletMap({ municipalities, selectedMunicipality, onMunicipalityClick, viewMode = 'balance' }: LeafletMapProps) {
   const mapRef = useRef<any>(null)
   const markersRef = useRef<any[]>([])
   const [isLeafletReady, setIsLeafletReady] = useState(false)
@@ -84,12 +85,29 @@ export default function LeafletMap({ municipalities, selectedMunicipality, onMun
 
     // Add markers for each municipality
     municipalities.forEach((municipality) => {
-      // Determine color based on classification
-      let color = "#fbbf24" // amber for equilibrio
-      if (municipality.clasificacion === "Sumidero") {
-        color = "#10b981" // emerald for sumidero
-      } else if (municipality.clasificacion === "Emisor") {
-        color = "#f43f5e" // rose for emisor
+      // Determine color based on view mode
+      let color = "#fbbf24" // default amber
+
+      if (viewMode === 'balance') {
+        // Color por clasificación de balance
+        if (municipality.clasificacion === "Sumidero") {
+          color = "#10b981" // emerald for sumidero
+        } else if (municipality.clasificacion === "Emisor") {
+          color = "#f43f5e" // rose for emisor
+        } else {
+          color = "#fbbf24" // amber for equilibrio
+        }
+      } else {
+        // Color por perfil
+        if (municipality.perfil === "Agrícola-Ganadero") {
+          color = "#16a34a" // green-600
+        } else if (municipality.perfil === "Industrial-Urbano") {
+          color = "#dc2626" // red-600
+        } else if (municipality.perfil === "Mixto-Transición") {
+          color = "#eab308" // yellow-500
+        } else if (municipality.perfil === "Sumideros Forestales") {
+          color = "#2563eb" // blue-600
+        }
       }
 
       // Create circle marker
@@ -137,7 +155,7 @@ export default function LeafletMap({ municipalities, selectedMunicipality, onMun
     })
 
     console.log("[v0] Added", markersRef.current.length, "markers to map")
-  }, [municipalities, onMunicipalityClick, isLeafletReady])
+  }, [municipalities, onMunicipalityClick, isLeafletReady, viewMode])
 
   // Highlight selected municipality
   useEffect(() => {

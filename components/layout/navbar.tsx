@@ -96,6 +96,12 @@ export function Navbar() {
             Juegos
           </Link>
           <Link
+            href="/metodologia"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Metodología
+          </Link>
+          <Link
             href="/acerca"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
@@ -152,6 +158,13 @@ export function Navbar() {
                   className="text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors py-3 px-4 rounded-lg"
                 >
                   Juegos
+                </Link>
+                <Link
+                  href="/metodologia"
+                  onClick={closeMenu}
+                  className="text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors py-3 px-4 rounded-lg"
+                >
+                  Metodología
                 </Link>
                 <Link
                   href="/acerca"

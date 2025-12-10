@@ -68,6 +68,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/metodologia" className="hover:text-foreground transition-colors">
+                  Metodología
+                </Link>
+              </li>
+              <li>
                 <Link href="/acerca" className="hover:text-foreground transition-colors">
                   Acerca de
                 </Link>
@@ -87,11 +92,6 @@ export function Footer() {
                 >
                   Documentación
                 </a>
-              </li>
-              <li>
-                <Link href="/acerca" className="hover:text-foreground transition-colors">
-                  Metodología
-                </Link>
               </li>
               <li>
                 <a
