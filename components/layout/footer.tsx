@@ -36,8 +36,8 @@ export function Footer() {
   return (
     <footer className="border-t bg-muted/30">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid gap-8 md:grid-cols-4">
-          <div className="space-y-3">
+        <div className="grid gap-8 grid-cols-2 md:grid-cols-4">
+          <div className="space-y-3 col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 font-bold text-lg">
               <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-primary-foreground shadow-sm">
                 <LeafIcon />
@@ -116,7 +116,7 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <h3 className="font-semibold mb-3">Proyecto</h3>
             <p className="text-sm text-muted-foreground mb-3">
               Datos al Ecosistema 2025
