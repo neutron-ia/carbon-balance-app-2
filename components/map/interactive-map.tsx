@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Download, Maximize2, Filter, X, Info } from "lucide-react"
+import { Maximize2, Filter, X, Info } from "lucide-react"
 import dynamic from "next/dynamic"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -53,6 +53,7 @@ export function InteractiveMap({ selectedMunicipalityName, onMunicipalitySelect 
   const [filterClasificacion, setFilterClasificacion] = useState<string[]>([])
   const [filterPerfil, setFilterPerfil] = useState<string[]>([])
   const [viewMode, setViewMode] = useState<'balance' | 'perfil'>('balance')
+  const [showFilters, setShowFilters] = useState(false)
 
   useEffect(() => {
     console.log("[v0] Fetching municipalities data...")
@@ -103,9 +104,9 @@ export function InteractiveMap({ selectedMunicipalityName, onMunicipalitySelect 
     [municipalities, onMunicipalitySelect],
   )
 
-  const handleExportPDF = () => {
-    alert("Funcionalidad de exportación PDF en desarrollo")
-  }
+  // const handleExportPDF = () => {
+  //   alert("Funcionalidad de exportación PDF en desarrollo")
+  // }
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen)
@@ -143,123 +144,86 @@ export function InteractiveMap({ selectedMunicipalityName, onMunicipalitySelect 
 
   return (
     <Card className={`p-4 ${isFullscreen ? "fixed inset-4 z-50" : ""}`}>
-      {/* Toggle de modo de visualización + Info */}
-      <div className="mb-3 flex items-center justify-between flex-wrap gap-2">
-        <div className="flex gap-2 items-center">
-          <Button
-            variant={viewMode === 'balance' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('balance')}
-          >
-            Por Balance
-          </Button>
-          <Button
-            variant={viewMode === 'perfil' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('perfil')}
-          >
-            Por Perfil
-          </Button>
+      {/* Controles en una sola línea */}
+      <div className="mb-3 flex items-center gap-2 flex-wrap">
+        <Button
+          variant={viewMode === 'balance' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setViewMode('balance')}
+          className="shrink-0"
+        >
+          Por Balance
+        </Button>
+        <Button
+          variant={viewMode === 'perfil' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setViewMode('perfil')}
+          className="shrink-0"
+        >
+          Por Perfil
+        </Button>
 
-          {/* Popover informativo */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Info className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80" align="start">
-              <div className="space-y-2">
-                <h4 className="font-semibold text-sm">Visualización del Mapa</h4>
+        {/* Botón de filtros */}
+        <Button
+          variant={showFilters ? 'default' : 'outline'}
+          size="sm"
+          className="h-8 shrink-0"
+          onClick={() => setShowFilters(!showFilters)}
+        >
+          <Filter className="h-3.5 w-3.5 mr-1.5" />
+          Filtros
+          {(filterClasificacion.length > 0 || filterPerfil.length > 0) && (
+            <Badge variant={showFilters ? 'outline' : 'secondary'} className="ml-1.5 h-4 px-1 text-[10px]">
+              {filterClasificacion.length + filterPerfil.length}
+            </Badge>
+          )}
+        </Button>
 
-                <div className="space-y-2 text-xs">
-                  <div>
-                    <p className="font-medium mb-1">Por Balance (IEC):</p>
-                    <ul className="space-y-1 ml-2">
-                      <li>• <strong>Sumidero (0-40):</strong> Captura más CO₂ del que emite</li>
-                      <li>• <strong>Equilibrio (41-60):</strong> Captura ≈ Emisiones</li>
-                      <li>• <strong>Emisor (61-100):</strong> Emite más CO₂ del que captura</li>
-                    </ul>
-                    <p className="text-muted-foreground mt-1 italic">
-                      *IEC es un índice normalizado de 0-100, no son toneladas.
-                    </p>
-                  </div>
+        {/* Popover informativo */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+              <Info className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80" align="start">
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm">Visualización del Mapa</h4>
 
-                  <div>
-                    <p className="font-medium mb-1">Por Perfil (Clustering):</p>
-                    <ul className="space-y-1 ml-2">
-                      <li>• <strong>Agrícola-Ganadero:</strong> Economía rural</li>
-                      <li>• <strong>Industrial-Urbano:</strong> Ciudades grandes</li>
-                      <li>• <strong>Mixto-Transición:</strong> Economía diversa</li>
-                      <li>• <strong>Sumideros Forestales:</strong> Alta cobertura boscosa</li>
-                    </ul>
-                  </div>
+              <div className="space-y-2 text-xs">
+                <div>
+                  <p className="font-medium mb-1">Por Balance (IEC):</p>
+                  <ul className="space-y-1 ml-2">
+                    <li>• <strong>Sumidero (0-40):</strong> Captura más CO₂ del que emite</li>
+                    <li>• <strong>Equilibrio (41-60):</strong> Captura ≈ Emisiones</li>
+                    <li>• <strong>Emisor (61-100):</strong> Emite más CO₂ del que captura</li>
+                  </ul>
+                  <p className="text-muted-foreground mt-1 italic">
+                    *IEC es un índice normalizado de 0-100, no son toneladas.
+                  </p>
+                </div>
+
+                <div>
+                  <p className="font-medium mb-1">Por Perfil (Clustering):</p>
+                  <ul className="space-y-1 ml-2">
+                    <li>• <strong>Agrícola-Ganadero:</strong> Economía rural</li>
+                    <li>• <strong>Industrial-Urbano:</strong> Ciudades grandes</li>
+                    <li>• <strong>Mixto-Transición:</strong> Economía diversa</li>
+                    <li>• <strong>Sumideros Forestales:</strong> Alta cobertura boscosa</li>
+                  </ul>
                 </div>
               </div>
-            </PopoverContent>
-          </Popover>
-        </div>
+            </div>
+          </PopoverContent>
+        </Popover>
 
-        <div className="flex gap-2 items-center">
-          <span className="text-xs text-muted-foreground">
-            {filteredMunicipalities.length} de {municipalities.length}
-          </span>
-          {(filterClasificacion.length > 0 || filterPerfil.length > 0) && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setFilterClasificacion([])
-                setFilterPerfil([])
-              }}
-            >
-              <X className="w-3 h-3 mr-1" />
-              Limpiar
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Filtros compactos */}
-      <div className="mb-3 space-y-2">
-        {/* Filtro por Clasificación */}
-        <div className="flex flex-wrap gap-1.5 items-center">
-          <span className="text-xs text-muted-foreground font-medium w-20">Clasificación:</span>
-          {['Sumidero', 'Equilibrio', 'Emisor'].map((clasificacion) => (
-            <Badge
-              key={clasificacion}
-              variant={filterClasificacion.includes(clasificacion) ? 'default' : 'outline'}
-              className="cursor-pointer text-xs px-2 py-0.5"
-              onClick={() => toggleClasificacion(clasificacion)}
-            >
-              {clasificacion}
-            </Badge>
-          ))}
-        </div>
-
-        {/* Filtro por Perfil */}
-        <div className="flex flex-wrap gap-1.5 items-center">
-          <span className="text-xs text-muted-foreground font-medium w-20">Perfil:</span>
-          {['Agrícola-Ganadero', 'Industrial-Urbano', 'Mixto-Transición', 'Sumideros Forestales'].map((perfil) => (
-            <Badge
-              key={perfil}
-              variant={filterPerfil.includes(perfil) ? 'default' : 'outline'}
-              className="cursor-pointer text-xs px-2 py-0.5"
-              onClick={() => togglePerfil(perfil)}
-            >
-              {perfil}
-            </Badge>
-          ))}
-        </div>
-      </div>
-
-      <div className="mb-4 flex flex-col sm:flex-row gap-2">
-        <div className="flex-1 relative z-50">
+        {/* Select de municipio */}
+        <div className="flex-1 relative z-50 min-w-[180px]">
           <Select
             value={isSelectedMunicipalityVisible ? selectedMunicipality?.municipio : undefined}
             onValueChange={handleMunicipalitySelect}
           >
-            <SelectTrigger>
+            <SelectTrigger className="h-8">
               <SelectValue placeholder="Seleccionar municipio..." />
             </SelectTrigger>
             <SelectContent className="max-h-[300px] z-[100]">
@@ -281,19 +245,81 @@ export function InteractiveMap({ selectedMunicipalityName, onMunicipalitySelect 
             </SelectContent>
           </Select>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="icon" onClick={toggleFullscreen}>
-            <Maximize2 className="w-4 h-4" />
-          </Button>
-          <Button variant="outline" onClick={handleExportPDF}>
-            <Download className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">PDF</span>
-          </Button>
-        </div>
+
+        {/* Botón maximizar */}
+        <Button variant="outline" size="icon" className="h-8 w-8 shrink-0" onClick={toggleFullscreen}>
+          <Maximize2 className="w-4 h-4" />
+        </Button>
       </div>
 
+      {/* Sección expandible de filtros */}
+      {showFilters && (
+        <div className="mb-3 p-3 border rounded-lg bg-muted/30 space-y-2.5 animate-in slide-in-from-top-2">
+          {/* Filtro por Clasificación */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-medium text-muted-foreground w-20 shrink-0">Clasificación:</span>
+            <div className="flex flex-wrap gap-1.5">
+              {['Sumidero', 'Equilibrio', 'Emisor'].map((clasificacion) => (
+                <Badge
+                  key={clasificacion}
+                  variant={filterClasificacion.includes(clasificacion) ? 'default' : 'outline'}
+                  className="cursor-pointer text-xs px-2 py-0.5 transition-colors"
+                  onClick={() => toggleClasificacion(clasificacion)}
+                >
+                  {clasificacion}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          {/* Filtro por Perfil */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-medium text-muted-foreground w-20 shrink-0">Perfil:</span>
+            <div className="flex flex-wrap gap-1.5">
+              {['Agrícola-Ganadero', 'Industrial-Urbano', 'Mixto-Transición', 'Sumideros Forestales'].map((perfil) => (
+                <Badge
+                  key={perfil}
+                  variant={filterPerfil.includes(perfil) ? 'default' : 'outline'}
+                  className="cursor-pointer text-xs px-2 py-0.5 transition-colors"
+                  onClick={() => togglePerfil(perfil)}
+                >
+                  {perfil}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between pt-2 border-t">
+            <span className="text-xs text-muted-foreground">
+              {filteredMunicipalities.length} de {municipalities.length} municipios
+            </span>
+            {(filterClasificacion.length > 0 || filterPerfil.length > 0) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs"
+                onClick={() => {
+                  setFilterClasificacion([])
+                  setFilterPerfil([])
+                }}
+              >
+                <X className="w-3 h-3 mr-1" />
+                Limpiar
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
       <div
-        className={`rounded-lg overflow-hidden relative z-10 ${isFullscreen ? "h-[calc(100%-5rem)]" : "aspect-[4/3]"}`}
+        className={`rounded-lg overflow-hidden relative z-10 ${
+          isFullscreen
+            ? showFilters
+              ? "h-[calc(100%-9rem)]"
+              : "h-[calc(100%-5rem)]"
+            : "aspect-[4/3]"
+        }`}
       >
         {isLoading ? (
           <div className="w-full h-full flex items-center justify-center bg-muted">
